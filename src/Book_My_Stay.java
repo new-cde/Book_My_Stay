@@ -1,79 +1,38 @@
-import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.Queue;
 
-abstract class Room {
+class Reservation {
 
-    protected String roomType;
-    protected int beds;
-    protected int size;
-    protected int price;
+    String guestName;
+    String roomType;
 
-    public Room(String roomType, int beds, int size, int price) {
+    public Reservation(String guestName, String roomType) {
+        this.guestName = guestName;
         this.roomType = roomType;
-        this.beds = beds;
-        this.size = size;
-        this.price = price;
-    }
-
-    public void displayRoomDetails() {
-        System.out.println(roomType + ":");
-        System.out.println("Beds: " + beds);
-        System.out.println("Size: " + size + " sq ft");
-        System.out.println("Price per night: " + price);
     }
 }
 
-class SingleRoom extends Room {
-    public SingleRoom() {
-        super("Single Room", 1, 200, 100);
-    }
-}
+class BookingRequestQueue {
 
-class DoubleRoom extends Room {
-    public DoubleRoom() {
-        super("Double Room", 2, 350, 180);
-    }
-}
+    private Queue<Reservation> queue = new LinkedList<>();
 
-class SuiteRoom extends Room {
-    public SuiteRoom() {
-        super("Suite Room", 3, 600, 300);
-    }
-}
-
-class RoomInventory {
-
-    private HashMap<String, Integer> inventory;
-
-    public RoomInventory() {
-        inventory = new HashMap<>();
-        inventory.put("Single Room", 5);
-        inventory.put("Double Room", 3);
-        inventory.put("Suite Room", 2);
+    public void addRequest(Reservation reservation) {
+        queue.add(reservation);
     }
 
-    public int getAvailability(String roomType) {
-        return inventory.getOrDefault(roomType, 0);
-    }
-}
+    public void processRequests() {
 
-class RoomSearchService {
+        System.out.println("Booking Request Queue");
 
-    private RoomInventory inventory;
+        while (!queue.isEmpty()) {
+            Reservation r = queue.poll();
 
-    public RoomSearchService(RoomInventory inventory) {
-        this.inventory = inventory;
-    }
-
-    public void searchAvailableRooms(Room[] rooms) {
-        for (Room room : rooms) {
-
-            int available = inventory.getAvailability(room.roomType);
-
-            if (available > 0) {
-                room.displayRoomDetails();
-                System.out.println("Available Rooms: " + available);
-                System.out.println();
-            }
+            System.out.println(
+                    "Processing booking for Guest: " +
+                            r.guestName +
+                            ", Room Type: " +
+                            r.roomType
+            );
         }
     }
 }
@@ -82,18 +41,12 @@ public class Book_My_Stay {
 
     public static void main(String[] args) {
 
-        System.out.println("Room Search\n");
+        BookingRequestQueue bookingQueue = new BookingRequestQueue();
 
-        RoomInventory inventory = new RoomInventory();
+        bookingQueue.addRequest(new Reservation("Abhi", "Single"));
+        bookingQueue.addRequest(new Reservation("Subha", "Double"));
+        bookingQueue.addRequest(new Reservation("Vanmathi", "Suite"));
 
-        Room[] rooms = {
-                new SingleRoom(),
-                new DoubleRoom(),
-                new SuiteRoom()
-        };
-
-        RoomSearchService searchService = new RoomSearchService(inventory);
-
-        searchService.searchAvailableRooms(rooms);
+        bookingQueue.processRequests();
     }
 }
