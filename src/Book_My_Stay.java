@@ -1,93 +1,78 @@
 import java.util.*;
 
-class Reservation {
-    String guestName;
-    String roomType;
+/**
+ * Book My Stay App
+ * Use Case 7: Add-On Service Selection
+ * @version 7.0
+ */
 
-    public Reservation(String guestName, String roomType) {
-        this.guestName = guestName;
-        this.roomType = roomType;
+// Service class
+class Service {
+
+    String serviceName;
+    int cost;
+
+    public Service(String serviceName, int cost) {
+        this.serviceName = serviceName;
+        this.cost = cost;
     }
 }
 
-class RoomInventory {
+// Manager class
+class AddOnServiceManager {
 
-    private HashMap<String, Integer> inventory = new HashMap<>();
+    private Map<String, List<Service>> serviceMap = new HashMap<>();
 
-    public RoomInventory() {
-        inventory.put("Single", 2);
-        inventory.put("Double", 1);
-        inventory.put("Suite", 1);
+    // Add service to a reservation
+    public void addService(String reservationId, Service service) {
+
+        serviceMap.putIfAbsent(reservationId, new ArrayList<>());
+        serviceMap.get(reservationId).add(service);
+
+        System.out.println("Added " + service.serviceName +
+                " to Reservation ID: " + reservationId);
     }
 
-    public int getAvailability(String type) {
-        return inventory.getOrDefault(type, 0);
-    }
+    // Display services and total cost
+    public void displayServices(String reservationId) {
 
-    public void reduceRoom(String type) {
-        inventory.put(type, inventory.get(type) - 1);
-    }
-}
+        System.out.println("\nAdd-On Services for Reservation ID: " + reservationId);
 
-class RoomAllocationService {
+        List<Service> services = serviceMap.get(reservationId);
 
-    private RoomInventory inventory;
+        int total = 0;
 
-    private HashMap<String, Set<String>> allocatedRooms = new HashMap<>();
-
-    public RoomAllocationService(RoomInventory inventory) {
-        this.inventory = inventory;
-
-        allocatedRooms.put("Single", new HashSet<>());
-        allocatedRooms.put("Double", new HashSet<>());
-        allocatedRooms.put("Suite", new HashSet<>());
-    }
-
-    public void processBookings(Queue<Reservation> queue) {
-
-        System.out.println("Room Allocation Processing");
-
-        while (!queue.isEmpty()) {
-
-            Reservation r = queue.poll();
-            String type = r.roomType;
-
-            if (inventory.getAvailability(type) > 0) {
-
-                String roomId = generateRoomId(type);
-
-                allocatedRooms.get(type).add(roomId);
-
-                inventory.reduceRoom(type);
-
-                System.out.println("Booking confirmed for Guest: " +
-                        r.guestName + ", Room ID: " + roomId);
+        if (services != null) {
+            for (Service s : services) {
+                System.out.println(s.serviceName + " - " + s.cost);
+                total += s.cost;
             }
         }
-    }
 
-    private String generateRoomId(String type) {
-
-        int number = allocatedRooms.get(type).size() + 1;
-
-        return type + "-" + number;
+        System.out.println("Total Add-On Cost: " + total);
     }
 }
 
+// Main class
 public class Book_My_Stay {
 
     public static void main(String[] args) {
 
-        Queue<Reservation> queue = new LinkedList<>();
+        System.out.println("Add-On Service Selection\n");
 
-        queue.add(new Reservation("Abhi", "Single"));
-        queue.add(new Reservation("Subha", "Single"));
-        queue.add(new Reservation("Vanmathi", "Suite"));
+        AddOnServiceManager manager = new AddOnServiceManager();
 
-        RoomInventory inventory = new RoomInventory();
+        // Example reservation IDs (from UC6)
+        String res1 = "Single-1";
+        String res2 = "Suite-1";
 
-        RoomAllocationService service = new RoomAllocationService(inventory);
+        // Add services
+        manager.addService(res1, new Service("Breakfast", 20));
+        manager.addService(res1, new Service("WiFi", 10));
+        manager.addService(res2, new Service("Airport Pickup", 50));
 
-        service.processBookings(queue);
+        // Display services
+        manager.displayServices(res1);
+        manager.displayServices(res2);
     }
 }
