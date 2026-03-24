@@ -1,11 +1,5 @@
 import java.util.*;
 
-/**
- * Book My Stay App
- * Use Case 11: Concurrent Booking Simulation (with Room ID)
- * @version 11.0
- */
-
 class RoomInventory {
 
     private Map<String, Integer> inventory = new HashMap<>();
